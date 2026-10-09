@@ -1,3 +1,4 @@
+
 [app]
 title = VideoPlayer
 package.name = videoplayer
@@ -6,7 +7,9 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 
-requirements = python3,kivy,ffpyplayer
+requirements = python3==3.11.5,hostpython3==3.11.5,kivy==2.3.0,ffpyplayer
+
+p4a.branch = v2024.01.21
 
 orientation = portrait
 fullscreen = 0
