@@ -8,21 +8,20 @@ from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.popup import Popup
 from kivy.uix.videoplayer import VideoPlayer
-from kivy.core.window import Window
+from kivy.utils import platform
 
 class PowerVideoPlayerApp(App):
     def build(self):
         # Главный контейнер
         self.main_layout = BoxLayout(orientation='vertical')
         
-        # Виджета плеера (Kivy использует ffpyplayer / FFmpeg для декодирования)
+        # Плеер на базе ffpyplayer (FFmpeg)
         self.player = VideoPlayer(options={'allow_stretch': True})
         self.player.state = 'stop'
         self.main_layout.add_widget(self.player)
         
         # Панель управления
         controls = BoxLayout(size_hint_y=None, height=50)
-        
         btn_open = Button(
             text='Открыть файл',
             background_color=(0.2, 0.6, 1, 1)
@@ -33,11 +32,19 @@ class PowerVideoPlayerApp(App):
         self.main_layout.add_widget(controls)
         return self.main_layout
 
+    def on_start(self):
+        # Запрос разрешений при запуске на Android
+        if platform == 'android':
+            from android.permissions import request_permissions, Permission
+            request_permissions([
+                Permission.READ_EXTERNAL_STORAGE,
+                Permission.READ_MEDIA_VIDEO
+            ])
+
     def open_file_dialog(self, instance):
-        # Окно выбора файла
         content = BoxLayout(orientation='vertical')
         
-        # Начальная папка (в Android это корневой каталог внешней памяти)
+        # Корневой каталог памяти Android
         start_path = '/sdcard' if os.path.exists('/sdcard') else '.'
         filechooser = FileChooserIconView(path=start_path)
         content.add_widget(filechooser)
@@ -67,7 +74,6 @@ class PowerVideoPlayerApp(App):
         popup.open()
 
     def play_video(self, filepath):
-        # Останавливаем предыдущее видео и загружаем новое
         self.player.state = 'stop'
         self.player.source = filepath
         self.player.state = 'play'
